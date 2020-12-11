@@ -86,7 +86,7 @@ int main()
     mpz_init_set_str(test_point2.y, "115792089237316195423570985008687907853269984665640564039457584007913111864738", 10);
     mpz_init_set_ui(test_point2.z, 1);
 
-    test_point3 = sum_points(test_point1, test_point2, my_params);
+    test_point3 = rot_sum(test_point1, test_point2, my_params);
     is_on_curve(test_point3, my_params);
 
     print_point(test_point3, "T + 0");
@@ -99,10 +99,10 @@ int main()
     test_point1 = test_point3;
     print_point(test_point1, "shitt");
 
-    test_point3 = sum_points(test_point3, test_point3, my_params); //Tx2
-    test_point3 = sum_points(test_point3, test_point3, my_params); //Tx4
-    test_point3 = sum_points(test_point3, test_point3, my_params); //Tx8
-    test_point3 = sum_points(test_point3, test_point3, my_params); //Tx16
+    test_point3 = rot_sum(test_point3, test_point3, my_params); //Tx2
+    test_point3 = rot_sum(test_point3, test_point3, my_params); //Tx4
+    test_point3 = rot_sum(test_point3, test_point3, my_params); //Tx8
+    test_point3 = rot_sum(test_point3, test_point3, my_params); //Tx16
 
     test_point3 = to_affine(test_point3, my_params);
     print_point(test_point3, "T + ... + T x16");

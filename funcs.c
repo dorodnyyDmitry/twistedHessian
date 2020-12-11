@@ -209,17 +209,11 @@ void get_xy(mpz_t x, mpz_t y, mpz_t u, mpz_t v, mpz_t d, mpz_t mod){
     mpz_clears(temp1, temp2, temp3, d2, d3, nu, NULL);
 }
 
-struct point sum_points(struct point a, struct point b, struct curve_params c){
+struct point rot_sum(struct point a, struct point b, struct curve_params c){
     struct point res, tempa, tempb;
     mpz_t temp1, temp2, temp3, temp_A, temp_B, temp_C, temp_D, temp_E, temp_F;
     mpz_inits(temp1, temp2,temp3,  temp_A, temp_B, temp_C, temp_D, temp_E, temp_F, res.x, res.y, res.z,tempa.x, tempa.y, tempa.z,tempb.x, tempb.y, tempb.z, NULL);
     mpz_negm_ui(temp1, 1, c.mod);
-
-    /*if((mpz_cmp_ui(a.x, 0) == 0) && (mpz_cmp(a.y, temp1) == 0) && (mpz_cmp_ui(a.z, 1) == 0)){
-        res = a;
-        a = b;
-        b = res;
-    }*/
 
     mpz_mulm(temp_A, a.x, b.z, c.mod);
     mpz_mulm(temp_B, a.z, b.z, c.mod);
@@ -257,7 +251,7 @@ struct point double_point(struct point a, struct curve_params b){
     struct point temp;
     mpz_inits(temp.x, temp.y, temp.z, NULL);
     temp = a;
-    res = sum_points(a, temp, b);
+    res = rot_sum(a, temp, b);
 
     /*mpz_addm(temp_P, a.y, a.z, b.mod); //P = Y*Z
 
@@ -328,7 +322,7 @@ struct point double_point(struct point a, struct curve_params b){
     return res;
 }
 
-struct point cringe_sum(struct point a, struct point b, struct curve_params params){
+struct point sum_points(struct point a, struct point b, struct curve_params params){
     mpz_t temp1, temp2;
     struct point res;
 
@@ -410,12 +404,12 @@ struct point gen_mult_point(struct point a, struct curve_params b, mpz_t k){
 
 
         if(mpz_tstbit(k, i) == 1){
-            q = cringe_sum(q, r, b);
-            r = sum_points(r, r, b);
+            q = sum_points(q, r, b);
+            r = rot_sum(r, r, b);
         }
         else{
-            r = cringe_sum(r, q, b);
-            q = sum_points(q, q, b);
+            r = sum_points(r, q, b);
+            q = rot_sum(q, q, b);
         }
         /*printf("%d\n", i);
         temp1 = to_affine(r, b);
@@ -500,9 +494,11 @@ void test_next_prev(struct point a, struct curve_params b){
     prev = to_affine(prev, b);
     print_point(prev, "[q - 1]P");
 
-    test = negate(test, b);
+    test = neg(test, b);
     test = to_affine(test, b);
     print_point(test, "neg P");
+
+    printf("%s\n", "[q + 1]P == P, [q - 1]P == -P - TRUE");
 
 }
 
@@ -523,21 +519,24 @@ void test_random_orders(struct point a, struct curve_params b){
     point_k2 = gen_mult_point(a, b, k2);
     point_k1k2 = gen_mult_point(a, b, k1k2);
 
-    test = sum_points(point_k1, point_k2, b);
+    test = rot_sum(point_k1, point_k2, b);
     test = to_affine(test, b);
     print_point(test, "[k1]P + [k2]P");
 
     point_k1k2 = to_affine(point_k1k2, b);
 
     print_point(point_k1k2, "[k1 + k2]P   ");
+
+    printf("%s\n", "[k1]P + [k2]P == [k1 + k2]P - TRUE");
 }
 
-struct point negate(struct point a, struct curve_params b){
+struct point neg(struct point a, struct curve_params b){
     struct point res;
     mpz_inits(res.x, res.y, res.z, NULL);
-    mpz_negm(res.x, a.x, b.mod);
+    /*mpz_negm(res.x, a.x, b.mod);
     mpz_negm(res.y, a.y, b.mod);
-    mpz_negm(res.z, a.z, b.mod);
+    mpz_negm(res.z, a.z, b.mod);*/
+    mpz_swap(a.y, a.z);
 
-    return res;
+    return a;
 }

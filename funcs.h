@@ -44,11 +44,11 @@ void get_ep(mpz_t rop, mpz_t d, mpz_t x, mpz_t y, mpz_t mod);
 
 void get_xy(mpz_t x, mpz_t y, mpz_t u, mpz_t v, mpz_t d, mpz_t mod);
 
-struct point sum_points(struct point a, struct point b, struct curve_params c);
+struct point rot_sum(struct point a, struct point b, struct curve_params c);
 
 struct point double_point(struct point a, struct curve_params b);
 
-struct point cringe_sum(struct point a, struct point b, struct curve_params params);
+struct point sum_points(struct point a, struct point b, struct curve_params params);
 
 struct point to_affine(struct point proj, struct curve_params params);
 
@@ -62,6 +62,6 @@ void test_next_prev(struct point a, struct curve_params b);
 
 void test_random_orders(struct point a, struct curve_params b);
 
-struct point negate(struct point a, struct curve_params b);
+struct point neg(struct point a, struct curve_params b);
 
 #endif//FUNCS_H
